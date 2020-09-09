@@ -14,7 +14,12 @@ def get_state():
 
 @route("/")
 def get_index():
-    return static_file("index.html", root = os.path.join(frontend_dir, "dist"))
+    if os.path.exists(os.path.join(frontend_dir, "dist", "index.html")):
+        index_file = "index.html"
+    else:
+        index_file = "Index.html"
+
+    return static_file(index_file, root = os.path.join(frontend_dir, "dist"))
 
 @route("/<view_name>")
 def get_view(view_name:str):
