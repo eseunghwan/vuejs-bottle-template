@@ -39,13 +39,15 @@ def get_static_files(static_file_path:str):
 def __start_server(host, port):
     run(host = host, port = port, quiet = False)
 
-def start_server(host:str, port:int):
+def start_server(host:str, port:int, open_browser:bool = False):
     threading.Thread(target = __start_server, args = [host, port], daemon = True).start()
 
     while True:
         try:
-            requests.get(f"http://127.0.0.1:{port}/state")
-            webbrowser.open_new(f"http://127.0.0.1:{port}")
+            requests.get(f"http://127.0.0.1:{port}/state")            
+            if open_browser:
+                webbrowser.open_new(f"http://127.0.0.1:{port}")
+
             break
         except requests.ConnectionError:
             pass
