@@ -11,9 +11,11 @@ if not os.path.exists(os.path.join(__dir__, "env")):
         os.system(f"{os.path.join(__dir__, 'env', 'bin', 'python')} -m pip install -r ./requirements.txt")
     elif sys.platform.startswith("win"):
         # in case of windows
+        # on windows, sometimes venv doesn't install pip even has no option "--without-pip"
         os.system(f"{sys.executable} -m pip install virtualenv")
         os.system(f"{sys.executable} -m virtualenv ./env")
         os.system(f"{os.path.join(__dir__, 'env', 'Scripts', 'python')} -m pip install -r ./requirements.txt")
 
-os.chdir(os.path.join(__dir__, "frontend"))
-os.system("npm install")
+if not os.path.exists(os.path.join(__dir__, "frontend", "node_packages")):
+    os.chdir(os.path.join(__dir__, "frontend"))
+    os.system("npm install")

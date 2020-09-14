@@ -1,7 +1,6 @@
 <template>
     <div id="app">
         <label-box v-bind:text="lbl1_text"></label-box>
-        <!-- <label id="lbl1">{{ lbl1_text }}</label> -->
         <button id="btn1" v-on:click="btn1_click">click me!</button>
         <label>Hi!</label>
     </div>
@@ -24,7 +23,6 @@ export default {
             }).then(() => {
                 axios.post(`${this.$fn}/set`, { message: "post" });
             });
-            // this.lbl1_text = "I'm changed!";
         }
     }
 };

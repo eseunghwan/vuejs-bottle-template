@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import os
-from backend.utils import read_config
 
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 
@@ -12,4 +11,4 @@ if os.path.exists(os.path.join(__dir__, "frontend", "package.json")):
 
 # run server
 from backend.server import start_server
-start_server("0.0.0.0", 47352)
+start_server("0.0.0.0", 47352, True)

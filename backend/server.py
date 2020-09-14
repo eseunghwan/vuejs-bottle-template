@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
 import os, threading, requests, webbrowser, signal
-from bottle import run, route, static_file, template, redirect
-from . import __path__, fn, utils
+from bottle import Bottle, run, route, static_file, template, redirect
+from . import __path__, fn
 
 backend_dir = __path__[0]
 root_dir = os.path.dirname(backend_dir)
 frontend_dir = os.path.join(root_dir, "frontend")
 
+bottle_app = Bottle()
 
-@route("/state")
+@bottle_app.route("/state")
 def get_state():
     return True
 
-@route("/")
+@bottle_app.route("/")
 def get_index():
     if os.path.exists(os.path.join(frontend_dir, "dist", "index.html")):
         index_file = "index.html"
@@ -21,7 +22,7 @@ def get_index():
 
     return static_file(index_file, root = os.path.join(frontend_dir, "dist"))
 
-@route("/<view_name>")
+@bottle_app.route("/<view_name>")
 def get_view(view_name:str):
     view_name_only = os.path.splitext(view_name)[0]
     if view_name == view_name_only or view_name.endswith(".html"):
@@ -31,15 +32,20 @@ def get_view(view_name:str):
 
     return static_file(view_file, root = os.path.join(frontend_dir, "dist"))
 
-@route("/<static_file_path:path>")
+@bottle_app.route("/<static_file_path:path>")
 def get_static_files(static_file_path:str):
     return static_file(static_file_path, root = os.path.join(frontend_dir, "dist"))
 
+@bottle_app.post("/stop")
+def stop_server():
+    os.kill(os.getpid(), signal.SIGTERM)
+
+fn.register(bottle_app)
 
 def __start_server(host, port):
-    run(host = host, port = port, quiet = False)
+    run(app = bottle_app, host = host, port = port, quiet = False)
 
-def start_server(host:str, port:int, open_browser:bool = False):
+def start_server(host:str, port:int, open_browser:bool = False, wait_server:bool = True):
     threading.Thread(target = __start_server, args = [host, port], daemon = True).start()
 
     while True:
@@ -52,8 +58,9 @@ def start_server(host:str, port:int, open_browser:bool = False):
         except requests.ConnectionError:
             pass
 
-    try:
-        while True:
-            pass
-    except KeyboardInterrupt:
-        os.kill(os.getpid(), signal.SIGTERM)
+    if wait_server:
+        try:
+            while True:
+                pass
+        except KeyboardInterrupt:
+            stop_server()
